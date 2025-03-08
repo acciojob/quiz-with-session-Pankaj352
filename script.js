@@ -45,9 +45,13 @@ function renderQuestions() {
       choiceElement.type = "radio";
       choiceElement.name = `question-${i}`;
       choiceElement.value = choice;
+      
+      // Ensure radio button is correctly checked after reload
       if (savedAnswers[i] === choice) {
-        choiceElement.checked = true;
+        choiceElement.setAttribute("checked", "true"); // Explicitly setting checked attribute
+        choiceElement.checked = true; // Ensuring correct state
       }
+      
       choiceElement.addEventListener("change", () => saveAnswer(i, choice));
       
       const label = document.createElement("label");
@@ -85,6 +89,7 @@ if (savedScore !== null) {
   scoreElement.innerText = `Your last score was ${savedScore} out of 5.`;
 }
 
+// Attach event listener to submit button
 submitButton.addEventListener("click", submitQuiz);
 
 // Initialize quiz
