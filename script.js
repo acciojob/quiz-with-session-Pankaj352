@@ -47,8 +47,9 @@ function renderQuestions() {
       choiceElement.name = `question-${i}`;
       choiceElement.value = choice;
 
+      // Ensure the radio button is checked correctly
       if (savedAnswers[i] === choice) {
-        choiceElement.checked = true;
+        choiceElement.checked = true; // ✅ Correct way to check radio buttons
       }
 
       choiceElement.addEventListener("change", () => saveAnswer(i, choice));
