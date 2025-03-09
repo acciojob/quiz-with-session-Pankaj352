@@ -28,10 +28,11 @@ const questions = [
 
 const questionsElement = document.getElementById("questions");
 const submitButton = document.getElementById("submit");
+const resetButton = document.getElementById("reset");
 const scoreElement = document.getElementById("score");
 
 // Load previous answers from session storage
-const savedAnswers = JSON.parse(sessionStorage.getItem("progress")) || {};
+const savedAnswers = JSON.parse(sessionStorage.getItem("progress") || "{}");
 
 // Render Questions
 function renderQuestions() {
@@ -39,28 +40,27 @@ function renderQuestions() {
   questions.forEach((q, i) => {
     const questionDiv = document.createElement("div");
     questionDiv.innerHTML = `<p>${q.question}</p>`;
-    
+
     q.choices.forEach((choice) => {
       const choiceElement = document.createElement("input");
       choiceElement.type = "radio";
       choiceElement.name = `question-${i}`;
       choiceElement.value = choice;
-      
-      // Ensure radio button is correctly checked after reload
+
       if (savedAnswers[i] === choice) {
-        choiceElement.setAttribute("checked", "true"); // Explicitly setting checked attribute
-        choiceElement.checked = true; // Ensuring correct state
+        choiceElement.checked = true;
       }
-      
+
       choiceElement.addEventListener("change", () => saveAnswer(i, choice));
-      
+
       const label = document.createElement("label");
       label.appendChild(choiceElement);
       label.appendChild(document.createTextNode(choice));
+
       questionDiv.appendChild(label);
       questionDiv.appendChild(document.createElement("br"));
     });
-    
+
     questionsElement.appendChild(questionDiv);
   });
 }
@@ -74,12 +74,22 @@ function saveAnswer(questionIndex, answer) {
 // Calculate and Display Score
 function submitQuiz() {
   let score = 0;
+  let unanswered = 0;
+
   questions.forEach((q, i) => {
-    if (savedAnswers[i] === q.answer) {
+    if (!savedAnswers[i]) {
+      unanswered++;
+    } else if (savedAnswers[i] === q.answer) {
       score++;
     }
   });
-  scoreElement.innerText = `Your score is ${score} out of 5.`;
+
+  if (unanswered > 0) {
+    scoreElement.innerText = `You left ${unanswered} question(s) unanswered. Your score is ${score} out of 5.`;
+  } else {
+    scoreElement.innerText = `Your score is ${score} out of 5.`;
+  }
+
   localStorage.setItem("score", score);
 }
 
@@ -89,8 +99,16 @@ if (savedScore !== null) {
   scoreElement.innerText = `Your last score was ${savedScore} out of 5.`;
 }
 
-// Attach event listener to submit button
+// Reset Quiz
+function resetQuiz() {
+  sessionStorage.removeItem("progress");
+  localStorage.removeItem("score");
+  location.reload();
+}
+
+// Attach event listeners
 submitButton.addEventListener("click", submitQuiz);
+resetButton.addEventListener("click", resetQuiz);
 
 // Initialize quiz
 renderQuestions();
